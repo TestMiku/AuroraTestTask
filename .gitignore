@@ -1,6 +1,7 @@
 venv/
 t2/api/*/__pycache__/
 t2/api/*/migrations/
+t2/api/docs/
 *.sqlite3
 .~lock*
 *.pdf

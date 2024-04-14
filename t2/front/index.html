@@ -114,12 +114,171 @@
         </div>
     </div>
     
+
+    <div class="container my-5" id="documentsContainer">
+        <!-- Cards will be added here -->
+
+    </div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+        Upload File
+    </button>
+    
+    <!-- Modal for uploading file -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadModalLabel">Upload File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for uploading file -->
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Choose File</label>
+                            <input type="file" class="form-control" id="fileInput" name="file">
+                        </div>
+                        <div class="mb-3">
+                            <label for="nameInput" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="nameInput" name="name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descriptionInput" class="form-label">Description</label>
+                            <textarea class="form-control" id="descriptionInput" name="description"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     
     <!-- Подключаем Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const storedUsername = localStorage.getItem('username');
+            const navbarNav = document.querySelector('.navbar-nav');
+
+            if (storedUsername) {
+                // Username found, update navbar to greet the user
+                navbarNav.innerHTML = `
+                    <li class="nav-item">
+                        <span class="nav-link">Привет, ${storedUsername}</span>
+                    </li>
+                `;
+            }
+
+            fetch('http://127.0.0.1:8000/api/v1/docs/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const documentsContainer = document.getElementById('documentsContainer');
+                documentsContainer.innerHTML = ''; // Clear existing content
+
+                // Group documents into sets of four
+                for (let i = 0; i < data.length; i += 4) {
+                    const row = document.createElement('div');
+                    row.classList.add('row', 'mb-3');
+
+                    // Create cards for each set of four documents
+                    for (let j = i; j < i + 4 && j < data.length; j++) {
+                        const doc = data[j];
+                        const cardCol = document.createElement('div');
+                        cardCol.classList.add('col-md-3');
+
+                        const cardElement = document.createElement('div');
+                        cardElement.classList.add('card');
+
+                        const cardBody = document.createElement('div');
+                        cardBody.classList.add('card-body');
+
+                        cardBody.innerHTML = `
+                            <h5 class="card-title">${doc.name}</h5>
+                            <p class="card-text">${doc.description}</p>
+                            <a href="${doc.file}" class="btn btn-primary" target="_blank">Download</a>
+                        `;
+
+                        cardElement.appendChild(cardBody);
+                        cardCol.appendChild(cardElement);
+                        row.appendChild(cardCol);
+                    }
+
+                    documentsContainer.appendChild(row);
+                }
+
+                // Add the "Add File" button
+                const addFileButton = document.createElement('button');
+                addFileButton.textContent = 'Add File';
+                addFileButton.classList.add('btn', 'btn-primary', 'mt-3');
+                addFileButton.addEventListener('click', () => {
+                    // Handle the click event for adding a file
+                    // For example, you can trigger a file input element to open
+                    alert('Add file functionality will be implemented here');
+                });
+                documentsContainer.appendChild(addFileButton);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+
+            document.getElementById('uploadForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+
+                // Retrieve userId from localStorage
+                const userId = localStorage.getItem('userId');
+
+                // Append userId to the formData
+                formData.append('user', userId);
+                // curl -X POST http://127.0.0.1:8000/api/v1/docs/ -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzEzMTkwMDA4LCJpYXQiOjE3MTMxMDM2MDgsImp0aSI6IjBjNGI4MGFiNTdlZjRmZWRhZTdhOWM5ZThkZDBlMTY1IiwidXNlcl9pZCI6MTV9.4JuE6QthMaZyoeKefa5R6fCKm_xABqDQemSaFnj3jF8" 
+                // -F "user=15" 
+                // -F "name=My Document"
+                //  -F "description=Description of my document" 
+                //  -F "file=@/home/miku/Downloads/тима.pdf"
+
+                fetch('http://127.0.0.1:8000/api/v1/docs/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle successful response (if needed)
+                    console.log('File uploaded successfully:', data);
+                    // Close the modal after successful upload
+                    const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
+                    modal.hide();
+                })
+                .catch(error => {
+                    // Handle error (if needed)
+                    console.error('Error uploading file:', error);
+                });
+            });
+
+
+
+
+
             // Обработчик отправки формы регистрации
             document.getElementById('registerForm').addEventListener('submit', function(event) {
                 event.preventDefault();
@@ -236,6 +395,13 @@
                     // Assuming data contains 'access' token and 'username'
                     localStorage.setItem('accessToken', data.access);
                     localStorage.setItem('username', data.username);
+                    localStorage.setItem('userId', data.username);
+                    const navbarNav = document.querySelector('.navbar-nav');
+                    navbarNav.innerHTML = `
+                        <li class="nav-item">
+                            <span class="nav-link">Привет, ${data.username}</span>
+                        </li>
+                    `;
                 })
 
                 .catch(error => {

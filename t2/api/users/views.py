@@ -40,7 +40,8 @@ class UserLoginAPIView(APIView):
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
-                'username': user.username  # Добавляем имя пользователя в ответ
+                'username': user.username,
+                'id': user.id,
             }, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
