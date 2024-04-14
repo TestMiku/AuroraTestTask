@@ -29,6 +29,17 @@
         </div>
     </div>
 
+
+    <div class="toast bg-success text-white" id="loginToast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; text-align: center; top: 40%; left: 50%; transform: translate(-50%, -50%);">
+        <div class="toast-header">
+            <strong class="me-auto">Уведомление</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Успешный вход в систему.
+        </div>
+    </div>
+
     <!-- Шапка с кнопками логина и регистрации -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-info">
         <div class="container-fluid">
@@ -221,6 +232,10 @@
                         profileHeader.textContent = data.username; // Предположим, что сервер возвращает информацию о пользователе, включая его имя
                     }
                     // Здесь вы можете сохранить токен JWT в localStorage или cookie
+
+                    // Assuming data contains 'access' token and 'username'
+                    localStorage.setItem('accessToken', data.access);
+                    localStorage.setItem('username', data.username);
                 })
 
                 .catch(error => {
@@ -240,7 +255,8 @@
             });
         });
     </script>
-    
+
+
     
 </body>
 </html>
