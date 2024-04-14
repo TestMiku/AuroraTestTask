@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 from datetime import timedelta
 
 # Configure SimpleJWT settings
@@ -153,3 +153,11 @@ CORS_ALLOW_ALL_ORIGINS = True
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'docs',
+# ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'docs')
+MEDIA_URL = '/docs/'

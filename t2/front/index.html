@@ -82,6 +82,7 @@
             </div>
         </div>
     </div>
+    
 
     
     <!-- Модальное окно для регистрации -->
@@ -124,35 +125,31 @@
     </button>
     
     <!-- Modal for uploading file -->
-    <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="uploadModalLabel">Upload File</h5>
+                    <h5 class="modal-title" id="updateModalLabel">Update Document</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Form for uploading file -->
-                    <form id="uploadForm" enctype="multipart/form-data">
+                    <form id="updateForm">
                         <div class="mb-3">
-                            <label for="fileInput" class="form-label">Choose File</label>
-                            <input type="file" class="form-control" id="fileInput" name="file">
+                            <label for="updateName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="updateName" name="name" required>
                         </div>
                         <div class="mb-3">
-                            <label for="nameInput" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="nameInput" name="name">
+                            <label for="updateDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="updateDescription" name="description" required></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="descriptionInput" class="form-label">Description</label>
-                            <textarea class="form-control" id="descriptionInput" name="description"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="btn btn-primary">Update</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
+    
+    
     
     <!-- Подключаем Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
@@ -187,6 +184,10 @@
             .then(data => {
                 const documentsContainer = document.getElementById('documentsContainer');
                 documentsContainer.innerHTML = ''; // Clear existing content
+                console.log(data);
+
+                // Retrieve username from local storage
+                const username = localStorage.getItem('username');
 
                 // Group documents into sets of four
                 for (let i = 0; i < data.length; i += 4) {
@@ -207,9 +208,20 @@
 
                         cardBody.innerHTML = `
                             <h5 class="card-title">${doc.name}</h5>
+                            <p class="text-muted">Author: ${doc.user.username}</p>
                             <p class="card-text">${doc.description}</p>
                             <a href="${doc.file}" class="btn btn-primary" target="_blank">Download</a>
                         `;
+
+                        // Add edit button if the author matches the username from local storage
+                        if (doc.user.username === username) {
+                            const editButton = document.createElement('button');
+                            editButton.textContent = 'Edit';
+                            editButton.classList.add('btn', 'btn-secondary', 'ms-2');
+                            editButton.addEventListener('click', () => {
+                            });
+                            cardBody.appendChild(editButton);
+                        }
 
                         cardElement.appendChild(cardBody);
                         cardCol.appendChild(cardElement);
@@ -218,36 +230,124 @@
 
                     documentsContainer.appendChild(row);
                 }
-
-                // Add the "Add File" button
-                const addFileButton = document.createElement('button');
-                addFileButton.textContent = 'Add File';
-                addFileButton.classList.add('btn', 'btn-primary', 'mt-3');
-                addFileButton.addEventListener('click', () => {
-                    // Handle the click event for adding a file
-                    // For example, you can trigger a file input element to open
-                    alert('Add file functionality will be implemented here');
-                });
-                documentsContainer.appendChild(addFileButton);
             })
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
 
+
+            fetch('http://127.0.0.1:8000/api/v1/docs/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const documentsContainer = document.getElementById('documentsContainer');
+                documentsContainer.innerHTML = ''; // Clear existing content
+                console.log(data);
+
+                // Retrieve username from local storage
+                const username = localStorage.getItem('username');
+
+                // Group documents into sets of four
+                for (let i = 0; i < data.length; i += 4) {
+                    const row = document.createElement('div');
+                    row.classList.add('row', 'mb-3');
+
+                    // Create cards for each set of four documents
+                    for (let j = i; j < i + 4 && j < data.length; j++) {
+                        const doc = data[j];
+                        const cardCol = document.createElement('div');
+                        cardCol.classList.add('col-md-3');
+
+                        const cardElement = document.createElement('div');
+                        cardElement.classList.add('card');
+
+                        const cardBody = document.createElement('div');
+                        cardBody.classList.add('card-body');
+
+                        cardBody.innerHTML = `
+                            <h5 class="card-title">${doc.name}</h5>
+                            <p class="text-muted">Author: ${doc.user.username}</p>
+                            <p class="card-text">${doc.description}</p>
+                            <a href="${doc.file}" class="btn btn-primary" target="_blank">Download</a>
+                        `;
+
+                        // Add edit button if the author matches the username from local storage
+                        if (doc.user.username === username) {
+                            const editButton = document.createElement('button');
+                            editButton.textContent = 'Edit';
+                            editButton.classList.add('btn', 'btn-secondary', 'ms-2');
+                            cardBody.appendChild(editButton);
+                        }
+
+                        cardElement.appendChild(cardBody);
+                        cardCol.appendChild(cardElement);
+                        row.appendChild(cardCol);
+                    }
+
+                    documentsContainer.appendChild(row);
+                }
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+
+
+
+
+
+            document.getElementById('updateForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const formData = new FormData(this);
+                const docId = this.parentElement.dataset.docId; // Retrieve the document ID from the modal data attribute
+
+                fetch(`http://127.0.0.1:8000/api/v1/docs/${docId}/`, {
+                    method: 'PATCH', // Use PATCH method for updating existing resource
+                    body: formData,
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Document updated successfully:', data);
+                    const modal = new bootstrap.Modal(document.getElementById('updateModal'));
+                    modal.hide();
+                    // Optionally, you can reload the documents after successful update
+                    // location.reload();
+                })
+                .catch(error => {
+                    console.error('Error updating document:', error);
+                });
+            });
+
+            
             document.getElementById('uploadForm').addEventListener('submit', function(event) {
                 event.preventDefault();
                 const formData = new FormData(this);
-
                 // Retrieve userId from localStorage
                 const userId = localStorage.getItem('userId');
 
                 // Append userId to the formData
                 formData.append('user', userId);
-                // curl -X POST http://127.0.0.1:8000/api/v1/docs/ -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzEzMTkwMDA4LCJpYXQiOjE3MTMxMDM2MDgsImp0aSI6IjBjNGI4MGFiNTdlZjRmZWRhZTdhOWM5ZThkZDBlMTY1IiwidXNlcl9pZCI6MTV9.4JuE6QthMaZyoeKefa5R6fCKm_xABqDQemSaFnj3jF8" 
-                // -F "user=15" 
-                // -F "name=My Document"
-                //  -F "description=Description of my document" 
-                //  -F "file=@/home/miku/Downloads/тима.pdf"
+                console.log('name',formData.get('name'))
+                console.log('description',formData.get('description'))
+                console.log('user',formData.get('user'))
+                console.log('file',formData.get('file'))
 
                 fetch('http://127.0.0.1:8000/api/v1/docs/', {
                     method: 'POST',
@@ -263,18 +363,14 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Handle successful response (if needed)
                     console.log('File uploaded successfully:', data);
-                    // Close the modal after successful upload
                     const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
                     modal.hide();
                 })
                 .catch(error => {
-                    // Handle error (if needed)
                     console.error('Error uploading file:', error);
                 });
             });
-
 
 
 
@@ -395,7 +491,7 @@
                     // Assuming data contains 'access' token and 'username'
                     localStorage.setItem('accessToken', data.access);
                     localStorage.setItem('username', data.username);
-                    localStorage.setItem('userId', data.username);
+                    localStorage.setItem('userId', data.id);
                     const navbarNav = document.querySelector('.navbar-nav');
                     navbarNav.innerHTML = `
                         <li class="nav-item">
