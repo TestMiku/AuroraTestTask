@@ -1,0 +1,6 @@
+venv/
+t2/api/*/__pycache__/
+t2/api/*/migrations/
+*.sqlite3
+.~lock*
+*.pdf
