@@ -208,6 +208,16 @@
                 `;
             }
 
+            const logoutButton = document.getElementById("logoutButton");
+            if (logoutButton) {
+                logoutButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    // Clear localStorage
+                    localStorage.clear();
+                    location.reload();
+                });
+            }
+
 
             fetch('http://127.0.0.1:8000/api/v1/docs/', {
                 method: 'GET',
@@ -398,23 +408,28 @@
             document.getElementById('updateForm').addEventListener('submit', function(event) {
                 event.preventDefault();
 
-                const cardElement = document.querySelector('.card'); // Пример, как получить cardElement, убедитесь, что это правильно в вашем случае
+                const cardElement = document.querySelector('.card'); // Get the card element, ensure it's correct for your case
 
                 if (cardElement) {
                     const docId = cardElement.getAttribute('data-doc-id');
-                    const updateData = {
-                        name: document.getElementById('updateName').value,
-                        description: document.getElementById('updateDescription').value
-                        // Include other fields as necessary
-                    };
+                    
+                    // Retrieve the file input element
+                    const fileInput = document.getElementById('fileUpdate');
+                    // Retrieve the file object
+                    const file = fileInput.files[0];
+
+                    // Construct FormData to include the updated file
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    formData.append('name', document.getElementById('updateName').value);
+                    formData.append('description', document.getElementById('updateDescription').value);
 
                     fetch(`http://127.0.0.1:8000/api/v1/docs/${docId}/`, {
                         method: 'PATCH',
                         headers: {
-                            'Content-Type': 'application/json',
                             'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
                         },
-                        body: JSON.stringify(updateData)
+                        body: formData
                     })
                     .then(response => {
                         if (!response.ok) {
@@ -432,22 +447,33 @@
                     .catch(error => {
                         console.error('Error updating document:', error);
                     })
-                    .then(data => {
-                        console.log('Document updated successfully:', data);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('updateModal'));
-                        modal.hide();
+                    .then(() => {
                         // Reload the page after updating the document
                         location.reload();
-                    })
+                    });
                 } else {
                     console.error('cardElement is not defined');
                 }
             });
 
 
-            
+
             document.getElementById('uploadForm').addEventListener('submit', function(event) {
                 event.preventDefault();
+                
+                // Check if username is present in local storage
+                const storedUsername = localStorage.getItem('username');
+                if (!storedUsername) {
+                    // Display error toast message if username is not present
+                    const errorToastMessage = document.getElementById('errorToastMessage');
+                    if (errorToastMessage) {
+                        errorToastMessage.textContent = 'Ошибка: Не удалось загрузить файл. Пожалуйста, выполните вход.';
+                        const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+                        errorToast.show();
+                    }
+                    return; // Stop further execution
+                }
+                
                 const formData = new FormData(this);
                 // Retrieve userId from localStorage
                 const userId = localStorage.getItem('userId');
@@ -488,7 +514,6 @@
                     location.reload();
                 })
             });
-
 
 
 
@@ -613,6 +638,9 @@
                     navbarNav.innerHTML = `
                         <li class="nav-item">
                             <span class="nav-link">Привет, ${data.username}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="logoutButton">Выход</a>
                         </li>
                     `;
                 })
