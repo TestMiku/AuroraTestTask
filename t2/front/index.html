@@ -115,14 +115,18 @@
         </div>
     </div>
     
+    <div class="container my-5">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            Upload File
+        </button>
+        <!-- Cards will be added here -->
 
+    </div>
     <div class="container my-5" id="documentsContainer">
         <!-- Cards will be added here -->
 
     </div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
-        Upload File
-    </button>
+    
     
     <!-- Modal for uploading file -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
@@ -198,6 +202,9 @@
                     <li class="nav-item">
                         <span class="nav-link">Привет, ${storedUsername}</span>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logoutButton">Выход</a>
+                    </li>
                 `;
             }
 
@@ -244,10 +251,19 @@
                             <h5 class="card-title">${doc.name}</h5>
                             <p class="text-muted">Автор: ${doc.user.username}</p>
                             <p class="card-text">${doc.description}</p>
-                            <button class="btn btn-primary view-document" data-doc-id="${doc.id}">Просмотр</button>
-                            <a href="#" class="btn btn-success ms-2 download-document" data-doc-id="${doc.id}" download>Скачать</a>
                         `;
 
+                        const viewButton = document.createElement('button');
+                        viewButton.textContent = 'View';
+                        viewButton.classList.add('btn', 'btn-primary', 'ms-2');
+                        viewButton.addEventListener('click', () => {
+                            window.location.href = `http://127.0.0.1:8000/api/v1/docs/${doc.id}/view/`; // Redirect to view endpoint
+                        });
+
+                        cardBody.appendChild(viewButton);
+
+                        // <button class="btn btn-primary view-document" data-doc-id="${doc.id}">Просмотр</button>
+                        // <a href="#" class="btn btn-success ms-2 download-document" data-doc-id="${doc.id}" download>Скачать</a>
 
                         // Add edit button if the author matches the username from local storage
                         if (doc.user.username === username) {
@@ -332,7 +348,20 @@
                 window.location.href = `http://example.com/api/docs/${docId}/download`;
             }
 
-
+            document.addEventListener("DOMContentLoaded", function() {
+                const logoutButton = document.getElementById("logoutButton");
+                if (logoutButton) {
+                    logoutButton.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        // Clear localStorage
+                        localStorage.clear();
+                        
+                        console.log(123); // Corrected typo
+                        // Redirect to the login page or any other desired location
+                        window.location.href = '/login'; // Example: Redirect to the login page
+                    });
+                }
+            });
 
 
             function deleteDocument(docId) {
@@ -354,7 +383,12 @@
                 })
                 .catch(error => {
                     console.error('Error deleting document:', error);
-                });
+                })
+                .then(data => {
+                    console.log('Document deleted successfully:', data);
+                    // Reload the page after deleting the document
+                    location.reload();
+                })
             }
 
 
@@ -397,7 +431,14 @@
                     })
                     .catch(error => {
                         console.error('Error updating document:', error);
-                    });
+                    })
+                    .then(data => {
+                        console.log('Document updated successfully:', data);
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('updateModal'));
+                        modal.hide();
+                        // Reload the page after updating the document
+                        location.reload();
+                    })
                 } else {
                     console.error('cardElement is not defined');
                 }
@@ -438,7 +479,14 @@
                 })
                 .catch(error => {
                     console.error('Error uploading file:', error);
-                });
+                })
+                .then(data => {
+                    console.log('File uploaded successfully:', data);
+                    const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
+                    modal.hide();
+                    // Reload the page after uploading the file
+                    location.reload();
+                })
             });
 
 
