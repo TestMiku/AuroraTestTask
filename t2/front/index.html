@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация и логин</title>
-    <!-- Подключаем Bootstrap CSS -->
+    <title>Doc API</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">    
 </head>
 <body>
 
+
+    <!-- Toast for successful registration -->
     <div class="toast bg-success text-white" id="registrationToast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; text-align: center; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="toast-header">
             <strong class="me-auto">Уведомление</strong>
@@ -19,17 +20,18 @@
         </div>
     </div>    
 
+    <!-- Toast for error messages -->
     <div class="toast bg-danger text-white" id="errorToast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; text-align: center; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div class="toast-header">
             <strong class="me-auto">Ошибка</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body" id="errorToastMessage">
-            <!-- Сообщение об ошибке будет здесь -->
+            <!-- Some error msg -->
         </div>
     </div>
 
-
+    <!-- Toast for successful login -->
     <div class="toast bg-success text-white" id="loginToast" role="alert" aria-live="assertive" aria-atomic="true" style="position: absolute; text-align: center; top: 40%; left: 50%; transform: translate(-50%, -50%);">
         <div class="toast-header">
             <strong class="me-auto">Уведомление</strong>
@@ -40,10 +42,10 @@
         </div>
     </div>
 
-    <!-- Шапка с кнопками логина и регистрации -->
+    <!-- navbar with (login and register)/(username and logout) -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-info">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Мое приложение</a>
+            <a class="navbar-brand" href="#">Doc API</a>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
@@ -57,7 +59,7 @@
         </div>
     </nav>
 
-    <!-- Модальное окно для логина -->
+    <!-- Login Modal -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -85,7 +87,7 @@
     
 
     
-    <!-- Модальное окно для регистрации -->
+    <!-- Registration Modal -->
     <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -94,7 +96,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Форма регистрации -->
                     <form id="registerForm">
                         <div class="mb-3">
                             <label for="registerUsername" class="form-label">Имя пользователя</label>
@@ -115,20 +116,25 @@
         </div>
     </div>
     
+
+    <!-- Container for file upload button -->
     <div class="container my-5">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
             Upload File
         </button>
-        <!-- Cards will be added here -->
 
     </div>
+
+
+
+    <!-- Container for displaying documents -->
     <div class="container my-5" id="documentsContainer">
-        <!-- Cards will be added here -->
+        <!-- Download Cards here -->
 
     </div>
     
     
-    <!-- Modal for uploading file -->
+    <!-- Upload Modal -->
     <div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -137,7 +143,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Form for uploading file -->
                     <form id="uploadForm" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="fileInput" class="form-label">Choose File</label>
@@ -157,7 +162,9 @@
             </div>
         </div>
     </div>
-    <!-- Modal for uploading file -->
+
+
+    <!-- Update Modal -->
     <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -188,480 +195,8 @@
     
     
     
-    <!-- Подключаем Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const storedUsername = localStorage.getItem('username');
-            const navbarNav = document.querySelector('.navbar-nav');
-
-            if (storedUsername) {
-                // Username found, update navbar to greet the user
-                navbarNav.innerHTML = `
-                    <li class="nav-item">
-                        <span class="nav-link">Привет, ${storedUsername}</span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="logoutButton">Выход</a>
-                    </li>
-                `;
-            }
-
-            const logoutButton = document.getElementById("logoutButton");
-            if (logoutButton) {
-                logoutButton.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    // Clear localStorage
-                    localStorage.clear();
-                    location.reload();
-                });
-            }
-
-
-            fetch('http://127.0.0.1:8000/api/v1/docs/', {
-                method: 'GET',
-                // headers: {
-                //     // 'Content-Type': 'application/json',
-                //     // 'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-                // }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const documentsContainer = document.getElementById('documentsContainer');
-                documentsContainer.innerHTML = ''; // Clear existing content
-                console.log(data);
-
-                // Retrieve username from local storage
-                const username = localStorage.getItem('username');
-
-                // Group documents into sets of four
-                for (let i = 0; i < data.length; i += 4) {
-                    const row = document.createElement('div');
-                    row.classList.add('row', 'mb-3');
-
-                    // Create cards for each set of four documents
-                    for (let j = i; j < i + 4 && j < data.length; j++) {
-                        const doc = data[j];
-                        const cardCol = document.createElement('div');
-                        cardCol.classList.add('col-md-3');
-
-                        const cardElement = document.createElement('div');
-                        cardElement.classList.add('card');
-                        cardElement.setAttribute('data-doc-id', doc.id);
-                        const cardBody = document.createElement('div');
-                        cardBody.classList.add('card-body');
-
-                        cardBody.innerHTML = `
-                            <h5 class="card-title">${doc.name}</h5>
-                            <p class="text-muted">Автор: ${doc.user.username}</p>
-                            <p class="card-text">${doc.description}</p>
-                        `;
-
-                        const viewButton = document.createElement('button');
-                        viewButton.textContent = 'View';
-                        viewButton.classList.add('btn', 'btn-primary', 'ms-2');
-                        viewButton.addEventListener('click', () => {
-                            window.location.href = `http://127.0.0.1:8000/api/v1/docs/${doc.id}/view/`; // Redirect to view endpoint
-                        });
-
-                        cardBody.appendChild(viewButton);
-
-                        // <button class="btn btn-primary view-document" data-doc-id="${doc.id}">Просмотр</button>
-                        // <a href="#" class="btn btn-success ms-2 download-document" data-doc-id="${doc.id}" download>Скачать</a>
-
-                        // Add edit button if the author matches the username from local storage
-                        if (doc.user.username === username) {
-                            const editButton = document.createElement('button');
-                            editButton.textContent = 'Edit';
-                            editButton.classList.add('btn', 'btn-secondary', 'ms-2');
-                            editButton.addEventListener('click', () => {
-                                // Assuming `doc` is the document object from your loop
-                                document.getElementById('updateName').value = doc.name;
-                                document.getElementById('updateDescription').value = doc.description;
-                                
-                                // Set the document's ID on the modal for later retrieval
-                                document.getElementById('updateModal').setAttribute('data-doc-id', doc.id);
-
-                                // Show the modal
-                                var updateModal = new bootstrap.Modal(document.getElementById('updateModal'));
-                                updateModal.show();
-                            });
-
-                            
-                            cardBody.appendChild(editButton);
-
-                            const deleteButton = document.createElement('button');
-                            deleteButton.textContent = 'Delete';
-                            deleteButton.classList.add('btn', 'btn-danger', 'ms-2');
-                            deleteButton.addEventListener('click', () => {
-                                // Assuming `doc` is the document object from your loop
-                                const confirmation = confirm('Are you sure you want to delete this document?');
-                                if (confirmation) {
-                                    // Call function to delete document
-                                    deleteDocument(doc.id);
-                                }
-                            });
-
-                            // Append delete button to card body
-                            cardBody.appendChild(deleteButton);
-                        }
-
-                        cardElement.appendChild(cardBody);
-                        cardCol.appendChild(cardElement);
-                        row.appendChild(cardCol);
-                    }
-
-                    documentsContainer.appendChild(row);
-                }
-            })
-            .catch(error => {
-                console.error('There has been a problem with your fetch operation:', error);
-            });
-
-
-            const viewButtons = document.querySelectorAll('.view-document');
-            viewButtons.forEach(button => {
-                button.addEventListener('click', viewDocument);
-            });
-
-            const downloadButtons = document.querySelectorAll('.download-document');
-            downloadButtons.forEach(button => {
-                button.addEventListener('click', downloadDocument);
-            });
-
-            // Функция для просмотра документа
-            function viewDocument(event) {
-                const docId = event.target.getAttribute('data-doc-id');
-                // Отправить запрос на сервер для просмотра документа с идентификатором docId
-                fetch(`http://example.com/api/docs/${docId}/view`, { method: 'GET' })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    // Дополнительная логика для отображения документа после успешного ответа от сервера
-                })
-                .catch(error => {
-                    console.error('Error viewing document:', error);
-                });
-            }
-
-            // Функция для загрузки документа
-            function downloadDocument(event) {
-                const docId = event.target.getAttribute('data-doc-id');
-                // Отправить запрос на сервер для загрузки документа с идентификатором docId
-                window.location.href = `http://example.com/api/docs/${docId}/download`;
-            }
-
-            document.addEventListener("DOMContentLoaded", function() {
-                const logoutButton = document.getElementById("logoutButton");
-                if (logoutButton) {
-                    logoutButton.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        // Clear localStorage
-                        localStorage.clear();
-                        
-                        console.log(123); // Corrected typo
-                        // Redirect to the login page or any other desired location
-                        window.location.href = '/login'; // Example: Redirect to the login page
-                    });
-                }
-            });
-
-
-            function deleteDocument(docId) {
-                fetch(`http://127.0.0.1:8000/api/v1/docs/${docId}/`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Document deleted successfully:', data);
-                    // Optionally refresh or update UI elements here to reflect the changes
-                })
-                .catch(error => {
-                    console.error('Error deleting document:', error);
-                })
-                .then(data => {
-                    console.log('Document deleted successfully:', data);
-                    // Reload the page after deleting the document
-                    location.reload();
-                })
-            }
-
-
-
-
-            
-            document.getElementById('updateForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                const cardElement = document.querySelector('.card'); // Get the card element, ensure it's correct for your case
-
-                if (cardElement) {
-                    const docId = cardElement.getAttribute('data-doc-id');
-                    
-                    // Retrieve the file input element
-                    const fileInput = document.getElementById('fileUpdate');
-                    // Retrieve the file object
-                    const file = fileInput.files[0];
-
-                    // Construct FormData to include the updated file
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('name', document.getElementById('updateName').value);
-                    formData.append('description', document.getElementById('updateDescription').value);
-
-                    fetch(`http://127.0.0.1:8000/api/v1/docs/${docId}/`, {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-                        },
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Document updated successfully:', data);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('updateModal'));
-                        modal.hide();
-
-                        // Optionally refresh or update UI elements here to reflect the changes
-                    })
-                    .catch(error => {
-                        console.error('Error updating document:', error);
-                    })
-                    .then(() => {
-                        // Reload the page after updating the document
-                        location.reload();
-                    });
-                } else {
-                    console.error('cardElement is not defined');
-                }
-            });
-
-
-
-            document.getElementById('uploadForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                // Check if username is present in local storage
-                const storedUsername = localStorage.getItem('username');
-                if (!storedUsername) {
-                    // Display error toast message if username is not present
-                    const errorToastMessage = document.getElementById('errorToastMessage');
-                    if (errorToastMessage) {
-                        errorToastMessage.textContent = 'Ошибка: Не удалось загрузить файл. Пожалуйста, выполните вход.';
-                        const errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
-                        errorToast.show();
-                    }
-                    return; // Stop further execution
-                }
-                
-                const formData = new FormData(this);
-                // Retrieve userId from localStorage
-                const userId = localStorage.getItem('userId');
-
-                // Append userId to the formData
-                formData.append('user', userId);
-                console.log('name',formData.get('name'))
-                console.log('description',formData.get('description'))
-                console.log('user',formData.get('user'))
-                console.log('file',formData.get('file'))
-
-                fetch('http://127.0.0.1:8000/api/v1/docs/', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('File uploaded successfully:', data);
-                    const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
-                    modal.hide();
-                })
-                .catch(error => {
-                    console.error('Error uploading file:', error);
-                })
-                .then(data => {
-                    console.log('File uploaded successfully:', data);
-                    const modal = new bootstrap.Modal(document.getElementById('uploadModal'));
-                    modal.hide();
-                    // Reload the page after uploading the file
-                    location.reload();
-                })
-            });
-
-
-
-            // Обработчик отправки формы регистрации
-            document.getElementById('registerForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const username = document.getElementById('registerUsername').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                // Отправляем данные на сервер для регистрации
-                fetch('http://127.0.0.1:8000/api/v1/users/register/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        email: email,
-                        password: password
-                    })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            let errorMessage = '';
-                            for (const key in data) {
-                                if (Object.hasOwnProperty.call(data, key)) {
-                                    errorMessage += `${data[key][0]}\n`;
-                                }
-                            }
-                            throw new Error(errorMessage || 'Unknown error occurred.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Обработка успешной регистрации
-                    console.log('Успешная регистрация:', data);
-                    // Показываем уведомление об успешной регистрации
-                    const registrationToast = document.getElementById('registrationToast');
-                    if (registrationToast) {
-                        const toastBody = registrationToast.querySelector('.toast-body');
-                        if (toastBody) {
-                            toastBody.textContent = 'Пользователь зарегистрирован. Теперь можно выполнить вход.';
-                            const toast = new bootstrap.Toast(registrationToast);
-                            toast.show();
-                        }
-                    }
-                })
-                .catch(error => {
-                    // Обработка ошибки регистрации
-                    console.error('Ошибка регистрации:', error);
-                    // Показываем уведомление об ошибке
-                    const errorToast = document.getElementById('errorToast');
-                    if (errorToast) {
-                        const toastBody = errorToast.querySelector('.toast-body');
-                        if (toastBody) {
-                            toastBody.textContent = error;
-                            const toast = new bootstrap.Toast(errorToast);
-                            toast.show();
-                        }
-                    }
-                });
-    
-            });
-    
-            // Обработчик отправки формы логина
-            document.getElementById('loginForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                // Отправляем данные на сервер для логина
-                fetch('http://127.0.0.1:8000/api/v1/users/login/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(data => {
-                            let errorMessage = '';
-                            for (const key in data) {
-                                if (Object.hasOwnProperty.call(data, key)) {
-                                    errorMessage += `${data[key][0]}\n`;
-                                }
-                            }
-                            throw new Error(errorMessage || 'Unknown error occurred.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Обработка успешного логина
-                    console.log('Успешный логин:', data);
-                    // Показываем уведомление об успешном логине
-                    const loginToast = document.getElementById('loginToast');
-                    if (loginToast) {
-                        const toastBody = loginToast.querySelector('.toast-body');
-                        if (toastBody) {
-                            toastBody.textContent = 'Успешный логин!';
-                            const toast = new bootstrap.Toast(loginToast);
-                            toast.show();
-                        }
-                    }
-                    // Обновляем шапку профиля
-                    const profileHeader = document.getElementById('profileHeader');
-                    if (profileHeader) {
-                        profileHeader.textContent = data.username; // Предположим, что сервер возвращает информацию о пользователе, включая его имя
-                    }
-                    // Здесь вы можете сохранить токен JWT в localStorage или cookie
-
-                    // Assuming data contains 'access' token and 'username'
-                    localStorage.setItem('accessToken', data.access);
-                    localStorage.setItem('username', data.username);
-                    localStorage.setItem('userId', data.id);
-                    const navbarNav = document.querySelector('.navbar-nav');
-                    navbarNav.innerHTML = `
-                        <li class="nav-item">
-                            <span class="nav-link">Привет, ${data.username}</span>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" id="logoutButton">Выход</a>
-                        </li>
-                    `;
-                })
-
-                .catch(error => {
-                    // Обработка ошибки логина
-                    console.error('Ошибка логина:', error);
-                    // Показываем уведомление об ошибке
-                    const errorToast = document.getElementById('errorToast');
-                    if (errorToast) {
-                        const toastBody = errorToast.querySelector('.toast-body');
-                        if (toastBody) {
-                            toastBody.textContent = error;
-                            const toast = new bootstrap.Toast(errorToast);
-                            toast.show();
-                        }
-                    }
-                });
-            });
-        });
-    </script>
+    <script src="scripts.js"></script>
 
 
     
